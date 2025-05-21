@@ -3,3 +3,4 @@ langchain-core==0.3.60
 langchain-chroma==0.2.4
 langchain-community==0.3.24
 langchain-google-genai==2.0.10
+Flask>=2.0.0
