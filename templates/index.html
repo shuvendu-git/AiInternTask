@@ -1,66 +1,234 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Document Research & Theme Chatbot</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 30px; }
-        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; }
-        th { background-color: #f2f2f2; }
-        .error { color: red; }
+        /* Reset and base */
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        /* Container */
+        .container {
+            background: white;
+            max-width: 900px;
+            width: 100%;
+            padding: 25px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 25px rgba(0,0,0,0.08);
+            margin-bottom: 40px;
+        }
+        /* File Upload Form */
+        form#upload-form {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        form#upload-form input[type="file"] {
+            flex-grow: 1;
+            padding: 7px 10px;
+            border: 2px solid #3498db;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #fff;
+            transition: border-color 0.3s ease;
+        }
+        form#upload-form input[type="file"]:hover {
+            border-color: #2980b9;
+        }
+        form#upload-form button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        form#upload-form button:hover {
+            background: #2980b9;
+        }
+        /* Documents list */
+        .documents {
+            margin-top: 5px;
+            font-size: 0.95rem;
+            color: #555;
+        }
+        .documents strong {
+            color: #222;
+        }
+        /* Query form */
+        form#query-form {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        form#query-form input[type="text"] {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 2px solid #3498db;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        form#query-form input[type="text"]:focus {
+            outline: none;
+            border-color: #2980b9;
+            box-shadow: 0 0 8px rgba(41,128,185,0.3);
+        }
+        form#query-form button {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        form#query-form button:hover {
+            background: #1e8449;
+        }
+        /* Error message */
+        .error-message {
+            color: #c0392b;
+            background: #fceae9;
+            border: 1px solid #e74c3c;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        /* Results */
+        .results {
+            margin-top: 30px;
+        }
+        .result-item {
+            background: #ecf0f1;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+            animation: fadeIn 0.4s ease forwards;
+        }
+        .result-item h3 {
+            margin: 0 0 6px 0;
+            font-size: 1.1rem;
+            color: #2c3e50;
+        }
+        .result-item p {
+            margin: 0;
+            white-space: normal;
+            color: #444;
+        }
+        .result-item .citation {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            font-style: italic;
+            margin-top: 8px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            form#upload-form,
+            form#query-form {
+                flex-direction: column;
+                gap: 12px;
+            }
+            form#query-form button,
+            form#upload-form button {
+                width: 100%;
+            }
+            form#upload-form input[type="file"],
+            form#query-form input[type="text"] {
+                width: 100%;
+            }
+        }
+        /* Link style for uploaded files */
+        .documents-list a {
+            color: #2980b9;
+            text-decoration: none;
+            margin-right: 10px;
+        }
+        .documents-list a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
-    <h1>Upload Documents </h1>
-    <form method="POST" enctype="multipart/form-data">
-        <input type="file" name="files" multiple required>
-        <button type="submit">Upload</button>
-    </form>
+    <h1>Document Research & Theme Chatbot</h1>
+    <div class="container">
+        <section>
+            <form id="upload-form" method="POST" enctype="multipart/form-data" autocomplete="off">
+                <input type="file" id="file-input" name="files" accept=".txt" multiple required />
+                <button type="submit">Upload Documents</button>
+            </form>
+            <div class="documents">
+                <strong>Uploaded Documents:</strong>
+                <div class="documents-list">
+                    {% if documents %}
+                        {% for doc in documents %}
+                            <a href="{{ url_for('uploaded_file', filename=doc) }}" target="_blank" title="Open {{ doc }}">{{ doc }}</a>
+                        {% endfor %}
+                    {% else %}
+                        <span>No documents uploaded yet.</span>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
 
-    <h2>Uploaded Documents</h2>
-    {% if documents %}
-    <ul>
-        {% for doc in documents %}
-            <li><a href="{{ url_for('uploaded_file', filename=doc) }}" target="_blank">{{ doc }}</a></li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p>No documents uploaded yet.</p>
-    {% endif %}
+        <section>
+            {% if error %}
+                <div class="error-message" role="alert">{{ error }}</div>
+            {% endif %}
+            <form id="query-form" method="POST" action="{{ url_for('query') }}" autocomplete="off">
+                <input type="text" name="question" placeholder="Ask a question about your documents..." value="{{ question or '' }}" required />
+                <button type="submit">Ask</button>
+            </form>
+        </section>
 
-    <hr>
-
-    <h2>Ask a Question</h2>
-    <form action="{{ url_for('query') }}" method="POST">
-        <input type="text" name="question" placeholder="Enter your question here" value="{{ question if question }}" required style="width: 60%;">
-        <button type="submit">Search</button>
-    </form>
-
-    {% if error %}
-    <p class="error">{{ error }}</p>
-    {% endif %}
-
-    {% if results %}
-    <h2>Results</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Document ID</th>
-                <th>Extracted Answer</th>
-                <th>Citation</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for res in results %}
-            <tr>
-                <td>{{ res.doc_id }}</td>
-                <td>{{ res.answer }}</td>
-                <td>{{ res.citation }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% endif %}
+        <section class="results">
+            {% if results %}
+                <h2>Results</h2>
+                {% for result in results %}
+                    <article class="result-item" tabindex="0">
+                        <h3>Document: {{ result.doc_id }}</h3>
+                        <p>{{ result.answer }}</p>
+                        <div class="citation">{{ result.citation }}</div>
+                    </article>
+                {% endfor %}
+            {% else %}
+                <p>No results found. Please try asking a different question.</p>
+            {% endif %}
+        </section>
+    </div>
 </body>
-</html> 
-
+</html>
