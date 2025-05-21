@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Document Research & Theme Chatbot</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #f2f2f2; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Upload Documents </h1>
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="files" multiple required>
+        <button type="submit">Upload</button>
+    </form>
+
+    <h2>Uploaded Documents</h2>
+    {% if documents %}
+    <ul>
+        {% for doc in documents %}
+            <li><a href="{{ url_for('uploaded_file', filename=doc) }}" target="_blank">{{ doc }}</a></li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No documents uploaded yet.</p>
+    {% endif %}
+
+    <hr>
+
+    <h2>Ask a Question</h2>
+    <form action="{{ url_for('query') }}" method="POST">
+        <input type="text" name="question" placeholder="Enter your question here" value="{{ question if question }}" required style="width: 60%;">
+        <button type="submit">Search</button>
+    </form>
+
+    {% if error %}
+    <p class="error">{{ error }}</p>
+    {% endif %}
+
+    {% if results %}
+    <h2>Results</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Document ID</th>
+                <th>Extracted Answer</th>
+                <th>Citation</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for res in results %}
+            <tr>
+                <td>{{ res.doc_id }}</td>
+                <td>{{ res.answer }}</td>
+                <td>{{ res.citation }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</body>
+</html> 
+
